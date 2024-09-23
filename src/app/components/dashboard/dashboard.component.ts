@@ -92,7 +92,8 @@ export class DashboardComponent implements AfterViewInit {
               backgroundColor: documentStyle.getPropertyValue('--yellow-600'),
               borderColor: documentStyle.getPropertyValue('--yellow-600'),
               tension: .4,
-              pointRadius: 1,
+              pointRadius: 3, // Increased from 1 to 3
+              pointHoverRadius: 6, // Increased hover radius for better visibility
               borderWidth: 1
             },
             {
@@ -103,7 +104,8 @@ export class DashboardComponent implements AfterViewInit {
               backgroundColor: documentStyle.getPropertyValue('--primary-color'),
               borderColor: documentStyle.getPropertyValue('--primary-color'),
               tension: .4,
-              pointRadius: 1,
+              pointRadius: 3, // Increased from 1 to 3
+              pointHoverRadius: 6, // Increased hover radius for better visibility
               borderWidth: 1
             },
 
@@ -169,6 +171,13 @@ export class DashboardComponent implements AfterViewInit {
   public getTotalHashRate(name: string, workers: any[]) {
     const workersByName = workers.filter(w => w.name == name);
     const sum = workersByName.reduce((pre, cur, idx, arr) => {
+      return pre += Math.floor(cur.hashRate);
+    }, 0);
+    return Math.floor(sum);
+  }
+
+  public getGlobalTotalHashRate(workers: any[]) {
+    const sum = workers.reduce((pre, cur, idx, arr) => {
       return pre += Math.floor(cur.hashRate);
     }, 0);
     return Math.floor(sum);
