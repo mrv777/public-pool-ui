@@ -1,6 +1,9 @@
 <div class="py-4 px-1 md:px4 lg:px-8 mx-0 lg:mx-8 main">
   <div class="grid justify-content-center">
-    <div class="col-12">
+    <div>
+        <img id="logo-omb" src="assets/layout/images/omb.jpg" alt="logo" />
+      </div>
+    <!-- <div class="col-12">
       <div class="card text-center">
         <div>
           <img id="logo" src="assets/layout/images/omb.jpg" alt="logo" />
@@ -9,7 +12,7 @@
         <div class="col-12 text-center title">
           <h1 class="text-900 font-normal">OMB Pool</h1>
         </div>
-        <!-- <div class="mb-4">
+        <div class="mb-4">
           <a
             class="ml-4 mr-4"
             href="https://twitter.com/Public_Pool_BTC"
@@ -31,30 +34,23 @@
           >
             <i class="pi pi-github" style="font-size: 30pt; color: white"></i>
           </a>
-        </div> -->
+        </div>
 
         <div>
-          <!-- <code>Fully Open Source Solo Bitcoin Mining Pool</code>
+          <code>Fully Open Source Solo Bitcoin Mining Pool</code>
                     <br>
-                    <br> -->
-          <div class="info mb-2 p-4 border-dashed border-1 border-round">
-            <code>stratum+tcp://{{ stratumURL }}</code>
-            <br />
-            <code
-              >username: &lt;your BTC address&gt;.&lt;worker name&gt;, password:
-              x</code
-            >
-          </div>
-          <!-- <span><b>NO FEES</b></span>
                     <br>
-                    <span>No second best.</span> -->
+          <span><b>NO FEES</b></span>
+                    <br>
+                    <span>No second best.</span>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="col-12">
-      <div class="card">
-        <h4 class="text-center">Pool Stats</h4>
+      <div class="card relative">
+        <h4 class="text-center">OMB Pool Stats</h4>
+        <p class="text-center text-sm absolute" style="top: 0.5rem; right: 1rem;">Last update: {{ lastUpdate$ | async | date:'MMM d, y, h:mm a' }}</p>
         <div *ngIf="networkInfo" class="network-info-container mt-4">
           <div class="network-info-item">
             <div class="info-label">Uptime</div>
@@ -67,9 +63,12 @@
             </div>
           </div>
           <div class="network-info-item">
-            <div class="info-label">Time to Next Block</div>
+            <div class="info-label">Avg Time to Find a Block</div>
             <div class="info-value">
-              {{ (hashrate$ | async) ?? 0 | averageTimeToBlock: networkInfo.difficulty }}
+              {{
+                (hashrate$ | async) ?? 0
+                  | averageTimeToBlock : networkInfo.difficulty
+              }}
             </div>
           </div>
         </div>
@@ -276,7 +275,15 @@
 
     <div class="col-12">
       <div class="card">
-        <h4>Login</h4>
+        <h4 class="text-center">Connection Info</h4>
+        <div class="info mb-2 p-4 border-dashed border-1 border-round text-center">
+            <code>stratum+tcp://{{ stratumURL }}</code>
+            <br />
+            <code
+              >username: &lt;your BTC address&gt;.&lt;worker name&gt;, password:
+              x</code
+            >
+          </div>
         <div class="field text-center">
           <input
             [formControl]="address"

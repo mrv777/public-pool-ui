@@ -12,13 +12,20 @@
     border-radius: 50%;
 }
 
+#logo-omb {
+    height: 170px;
+    width: 170px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
 .title {
     margin-top: 55px;
 }
 
-.main {
-    margin-top: 60px;
-}
+// .main {
+//     margin-top: 60px;
+// }
 
 .info {
     font-weight: bold;
@@ -26,10 +33,8 @@
 }
 
 .card {
-    max-width: 1024px;
+    // max-width: 1024px;
     margin: 0 auto;
-
-
 }
 
 .pi-star-fill {
@@ -62,3 +67,7 @@
     font-weight: bold;
     color: #ffffff;
 }
+
+// h1 {
+//     font-family: "Rock Salt","Play", sans-serif;
+// }

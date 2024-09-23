@@ -18,7 +18,7 @@
         color: var(--surface-900);
         font-size: 1.5rem;
         font-weight: 500;
-        width: 300px;
+        width: 200px;
         border-radius: 12px;
 
         img {
@@ -63,6 +63,7 @@
     }
 
     .layout-menu-button {
+        display: none;
         margin-left: 2rem;
     }
 
@@ -104,6 +105,9 @@
             display: inline-flex;
             margin-left: 0;
             order: 3;
+        }
+        .layout-menu-button {
+            display: block;
         }
 
         .layout-topbar-menu {

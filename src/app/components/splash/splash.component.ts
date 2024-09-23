@@ -1,13 +1,11 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, map, Observable, shareReplay } from 'rxjs';
+import { combineLatest, map, Observable, shareReplay, switchMap, interval, startWith } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { HashSuffixPipe } from '../../pipes/hash-suffix.pipe';
 import { AppService } from '../../services/app.service';
 import { bitcoinAddressValidator } from '../../validators/bitcoin-address.validator';
-import { AverageTimeToBlockPipe } from 'src/app/pipes/average-time-to-block.pipe';
-
 
 @Component({
   selector: 'app-splash',
@@ -15,6 +13,8 @@ import { AverageTimeToBlockPipe } from 'src/app/pipes/average-time-to-block.pipe
   styleUrls: ['./splash.component.scss']
 })
 export class SplashComponent {
+
+  private refreshInterval = 60000;
 
   public address: FormControl;
 
@@ -24,6 +24,8 @@ export class SplashComponent {
   public highScores$: Observable<any>;
   public uptime$: Observable<string>;
   public hashrate$: Observable<number>;
+
+  public lastUpdate$: Observable<Date>;
 
   public chartOptions: any;
 
@@ -35,7 +37,19 @@ export class SplashComponent {
 
   constructor(private appService: AppService, private cdr: ChangeDetectorRef) {
 
-    this.info$ = this.appService.getInfo().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    // Set up an interval to refresh data every 60 seconds
+    const refreshInterval$ = interval(this.refreshInterval).pipe(startWith(0));
+    
+    // Update lastUpdate$ to emit the current date on each refresh
+    this.lastUpdate$ = refreshInterval$.pipe(
+      map(() => new Date()),
+      shareReplay({ refCount: true, bufferSize: 1 })
+    );
+
+    this.info$ = refreshInterval$.pipe(
+      switchMap(() => this.appService.getInfo()),
+      shareReplay({ refCount: true, bufferSize: 1 })
+    );
 
     if (environment.STRATUM_URL.length > 1) {
       this.stratumURL = environment.STRATUM_URL;
@@ -46,9 +60,14 @@ export class SplashComponent {
     this.blockData$ = this.info$.pipe(map(info => info.blockData));
     this.userAgents$ = this.info$.pipe(map(info => info.userAgents));
     this.highScores$ = this.info$.pipe(map(info => info.highScores));
-    this.uptime$ = this.info$.pipe(map(info => info.uptime))
+    this.uptime$ = this.info$.pipe(map(info => info.uptime));
 
-    this.chartData$ = combineLatest([this.appService.getInfoChart(), this.appService.getNetworkInfo()]).pipe(
+    // Modify chartData$ to refresh both getInfoChart and getNetworkInfo
+    this.chartData$ = refreshInterval$.pipe(
+      switchMap(() => combineLatest([
+        this.appService.getInfoChart(),
+        this.appService.getNetworkInfo()
+      ])),
       map(([chartData, networkInfo]) => {
         this.networkInfo = networkInfo;
         return {
@@ -74,13 +93,10 @@ export class SplashComponent {
     this.hashrate$ = this.chartData$.pipe(map(chartData => chartData.datasets[0].data.slice(-1)[0])); 
     this.address = new FormControl(null, bitcoinAddressValidator());
 
-
-
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
     const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-
 
     this.chartOptions = {
       maintainAspectRatio: false,
@@ -136,6 +152,5 @@ export class SplashComponent {
         }
       }
     };
-
   }
 }
