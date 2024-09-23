@@ -23,6 +23,7 @@ export class SplashComponent {
   public userAgents$: Observable<any>;
   public highScores$: Observable<any>;
   public uptime$: Observable<string>;
+  public hashrate$: Observable<number>;
 
   public chartOptions: any;
 
@@ -30,7 +31,7 @@ export class SplashComponent {
 
   private info$: Observable<any>;
 
-  private networkInfo:any;
+  public networkInfo:any;
 
   constructor(private appService: AppService, private cdr: ChangeDetectorRef) {
 
@@ -55,13 +56,14 @@ export class SplashComponent {
           labels: chartData.map((d: any) => d.label),
           datasets: [
             {
-              label: 'Public-Pool Hashrate',
+              label: 'OMBs Hashrate',
               data: chartData.map((d: any) => d.data),
               fill: false,
               backgroundColor: documentStyle.getPropertyValue('--primary-color'),
               borderColor: documentStyle.getPropertyValue('--primary-color'),
               tension: .4,
-              pointRadius: 1,
+              pointRadius: 3, // Increased from 1 to 3
+              pointHoverRadius: 6, // Increased hover radius for better visibility
               borderWidth: 1
             }
           ]
@@ -69,6 +71,7 @@ export class SplashComponent {
       })
     );
 
+    this.hashrate$ = this.chartData$.pipe(map(chartData => chartData.datasets[0].data.slice(-1)[0])); 
     this.address = new FormControl(null, bitcoinAddressValidator());
 
 
@@ -85,6 +88,18 @@ export class SplashComponent {
         legend: {
           labels: {
             color: textColor
+          }
+        },
+        tooltip: { // Updated from 'tooltips' to 'tooltip'
+          callbacks: {
+            label: function(tooltipItem: any) {
+              let label = tooltipItem.dataset.label || '';
+              if (label) {
+                label += ': ';
+              }
+              label += HashSuffixPipe.transform(tooltipItem.raw);
+              return label;
+            }
           }
         }
       },
@@ -106,9 +121,12 @@ export class SplashComponent {
         y: {
           ticks: {
             color: textColorSecondary,
+            // callback: (value: number) => {
+            //     return HashSuffixPipe.transform(value) + " - " + AverageTimeToBlockPipe.transform(value, this.networkInfo.difficulty);
+            // }
             callback: (value: number) => {
-                return HashSuffixPipe.transform(value) + " - " + AverageTimeToBlockPipe.transform(value, this.networkInfo.difficulty);
-            }
+              return HashSuffixPipe.transform(value);
+          }
           },
           grid: {
             color: surfaceBorder,

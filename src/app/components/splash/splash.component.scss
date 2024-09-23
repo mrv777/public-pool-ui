@@ -4,11 +4,12 @@
 
 #logo {
     left: 50%;
-    margin-left: -100px;
-    height: 200px;
-    width: 200px;
+    margin-left: -85px;
+    height: 170px;
+    width: 170px;
     position: absolute;
-    top: -18px;
+    top: 0px;
+    border-radius: 50%;
 }
 
 .title {
@@ -33,4 +34,31 @@
 
 .pi-star-fill {
     color: gold;
+}
+
+.network-info-container {
+    display: flex;
+    justify-content: space-around;
+    // background-color: #2a2a2a;
+    // border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.network-info-item {
+    text-align: center;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #ffffff;
 }

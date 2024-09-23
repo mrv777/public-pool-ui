@@ -1,221 +1,303 @@
 <div class="py-4 px-1 md:px4 lg:px-8 mx-0 lg:mx-8 main">
-    <div class="grid justify-content-center">
+  <div class="grid justify-content-center">
+    <div class="col-12">
+      <div class="card text-center">
+        <div>
+          <img id="logo" src="assets/layout/images/omb.jpg" alt="logo" />
+        </div>
 
-        <div class="col-12">
+        <div class="col-12 text-center title">
+          <h1 class="text-900 font-normal">OMB Pool</h1>
+        </div>
+        <!-- <div class="mb-4">
+          <a
+            class="ml-4 mr-4"
+            href="https://twitter.com/Public_Pool_BTC"
+            target="_blank"
+          >
+            <i class="pi pi-twitter" style="font-size: 30pt; color: white"></i>
+          </a>
+          <a
+            class="ml-4 mr-4"
+            href="https://discord.gg/pF9smpe3yE"
+            target="_blank"
+          >
+            <i class="pi pi-discord" style="font-size: 30pt; color: white"></i>
+          </a>
+          <a
+            class="ml-4 mr-4"
+            href="https://github.com/benjamin-wilson/public-pool"
+            target="_blank"
+          >
+            <i class="pi pi-github" style="font-size: 30pt; color: white"></i>
+          </a>
+        </div> -->
 
-            <div class="card text-center">
-
-                <div>
-                    <img id="logo" style="height: 200px;" src="assets/layout/images/logo.svg" alt="logo">
-
-                </div>
-
-                <div class="col-12 text-center title">
-                    <h1 class="text-900 font-normal">Public Pool</h1>
-                </div>
-                <div class="mb-4">
-                    <a class="ml-4 mr-4" href="https://twitter.com/Public_Pool_BTC" target="_blank">
-                        <i class="pi pi-twitter" style="font-size: 30pt; color: white;"></i>
-                    </a>
-                    <a class="ml-4 mr-4" href="https://discord.gg/pF9smpe3yE" target="_blank">
-                        <i class="pi pi-discord" style="font-size: 30pt; color: white;"></i>
-                    </a>
-                    <a class="ml-4 mr-4" href="https://github.com/benjamin-wilson/public-pool" target="_blank">
-                        <i class="pi pi-github" style="font-size: 30pt; color: white;"></i>
-                    </a>
-
-                </div>
-
-                <div>
-                    <code>Fully Open Source Solo Bitcoin Mining Pool</code>
+        <div>
+          <!-- <code>Fully Open Source Solo Bitcoin Mining Pool</code>
                     <br>
+                    <br> -->
+          <div class="info mb-2 p-4 border-dashed border-1 border-round">
+            <code>stratum+tcp://{{ stratumURL }}</code>
+            <br />
+            <code
+              >username: &lt;your BTC address&gt;.&lt;worker name&gt;, password:
+              x</code
+            >
+          </div>
+          <!-- <span><b>NO FEES</b></span>
                     <br>
-                    <div class="info mb-2 p-4 border-dashed border-1 border-round">
-                        <code>stratum+tcp://{{stratumURL}}</code>
-                        <br>
-                        <code>username: &lt;your BTC address&gt;.&lt;worker name&gt;, password: x</code>
-                    </div>
-                    <span><b>NO FEES</b></span>
-                    <br>
-                    <span>No second best.</span>
-                </div>
-
-
-
-
-            </div>
+                    <span>No second best.</span> -->
         </div>
+      </div>
+    </div>
 
-        <div class="col-12">
-            <div class="card">
-                <h4>Login</h4>
-                <div class="field text-center">
-
-                    <input [formControl]="address" placeholder="Address (bc1...)" pInputText id="address" type="text"
-                        class="p-inputtext p-component p-element">
-                    <button [disabled]="address.invalid" class="ml-3 mt-3" pButton label="My Workers"
-                        [routerLink]="['app',address.value]"></button>
-                </div>
+    <div class="col-12">
+      <div class="card">
+        <h4 class="text-center">Pool Stats</h4>
+        <div *ngIf="networkInfo" class="network-info-container mt-4">
+          <div class="network-info-item">
+            <div class="info-label">Uptime</div>
+            <div class="info-value">{{ uptime$ | async | dateAgo }}</div>
+          </div>
+          <div class="network-info-item">
+            <div class="info-label">Hashrate</div>
+            <div class="info-value">
+              {{ (hashrate$ | async) ?? 0 | hashSuffix }}
             </div>
-        </div>
-
-        <div class="col-12">
-            <div class="card chart">
-
-                <div class="text-center mb-2">Uptime: {{uptime$ | async | dateAgo}}</div>
-
-                <ng-container *ngIf="chartData$ | async as chartData; else loadingChart">
-                    
-                    <p-chart [responsive]="true" type="line" [data]="chartData" [options]="chartOptions"></p-chart>
-
-                </ng-container>
-                <ng-template #loadingChart>
-                    <p-skeleton width="100%" height="40vh"></p-skeleton>
-                </ng-template>
+          </div>
+          <div class="network-info-item">
+            <div class="info-label">Time to Next Block</div>
+            <div class="info-value">
+              {{ (hashrate$ | async) ?? 0 | averageTimeToBlock: networkInfo.difficulty }}
             </div>
+          </div>
         </div>
+      </div>
+    </div>
 
+    <div class="col-12">
+      <div class="card chart">
+        <ng-container
+          *ngIf="chartData$ | async as chartData; else loadingChart"
+        >
+          <p-chart
+            [responsive]="true"
+            type="line"
+            [data]="chartData"
+            [options]="chartOptions"
+          ></p-chart>
+        </ng-container>
+        <ng-template #loadingChart>
+          <p-skeleton width="100%" height="40vh"></p-skeleton>
+        </ng-template>
+      </div>
+    </div>
 
-        <div class="col-12">
-            <div class="card">
-                <h4 style="text-align: center;">Online Devices</h4>
-                <ng-container *ngIf="userAgents$ | async as userAgents">
-                    <p-table [value]="userAgents">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Device</th>
-                                <th>Currently Working</th>
-                                <th>Total Hash Rate</th>
-                                <th>Best Difficulty <i class="pi pi-question-circle ml-2"
-                                        pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."></i>
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-userAgent>
-                            <tr></tr>
-                            <tr>
-                                <td><app-user-agent-link [userAgent]="userAgent.userAgent"></app-user-agent-link></td>
-                                <td>{{ userAgent.count }}</td>
-                                <td>{{ userAgent.totalHashRate | hashSuffix }}</td>
-                                <td>{{ userAgent.bestDifficulty | numberSuffix}}</td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                    <div class="text-right mt-2">
-                        <i class="pi pi-star-fill"></i> = Open Source Software & Hardware
-                    </div>
-                </ng-container>
-                <ng-template #loadingTable>
-                    <p-table [value]="[{},{},{}]">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Device</th>
-                                <th>Currently Working</th>
-                                <th>Total Hash Rate</th>
-                                <th>Best Difficulty <i class="pi pi-question-circle ml-2"
-                                        pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."></i>
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-row>
-                            <tr></tr>
-                            <tr>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </ng-template>
+    <div class="col-12">
+      <div class="card">
+        <h4 class="text-center">Network Info</h4>
+        <div *ngIf="networkInfo" class="network-info-container mt-4">
+          <div class="network-info-item">
+            <div class="info-label">Block</div>
+            <div class="info-value">{{ networkInfo.blocks }}</div>
+          </div>
+          <div class="network-info-item">
+            <div class="info-label">Difficulty</div>
+            <div class="info-value">
+              {{ networkInfo.difficulty | numberSuffix }}
             </div>
-        </div>
-
-
-        <div class="col-12" *ngIf="highScores$ | async as highScores">
-            <div class="card">
-                <h4 style="text-align: center;">High Scores</h4>
-                <ng-container>
-                    <p-table [value]="highScores">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Rank</th>
-                                <th>Difficulty</th>
-                                <th>Device</th>
-                                <th>When</th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-highScore let-i="rowIndex">
-                            <tr></tr>
-                            <tr>
-                                <td>#{{i+1}}</td>
-                                <td>{{ highScore.bestDifficulty | numberSuffix }}</td>
-                                <td><app-user-agent-link
-                                        [userAgent]="highScore.bestDifficultyUserAgent ? highScore.bestDifficultyUserAgent : 'unknown'"></app-user-agent-link>
-                                </td>
-                                <td>{{ highScore.updatedAt | dateAgo}} ago</td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                    <div class="text-right mt-2">
-                        <i class="pi pi-star-fill"></i> = Open Source Software & Hardware
-                    </div>
-                </ng-container>
-                <ng-template #loadingTable>
-                    <p-table [value]="[{},{},{}]">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Device</th>
-                                <th>Currently Working</th>
-                                <th>Total Hash Rate</th>
-                                <th>Best Difficulty <i class="pi pi-question-circle ml-2"
-                                        pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."></i>
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-row>
-                            <tr></tr>
-                            <tr>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                                <td><p-skeleton></p-skeleton></td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </ng-template>
+          </div>
+          <div class="network-info-item">
+            <div class="info-label">Hashrate</div>
+            <div class="info-value">
+              {{ networkInfo.networkhashps | hashSuffix }}
             </div>
+          </div>
         </div>
+      </div>
+    </div>
 
+    <div class="col-12">
+      <div class="card">
+        <h4 style="text-align: center">Online Devices</h4>
+        <ng-container *ngIf="userAgents$ | async as userAgents">
+          <p-table [value]="userAgents">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Device</th>
+                <th>Currently Working</th>
+                <th>Total Hash Rate</th>
+                <th>
+                  Best Difficulty
+                  <i
+                    class="pi pi-question-circle ml-2"
+                    pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."
+                  ></i>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-userAgent>
+              <tr></tr>
+              <tr>
+                <td>
+                  <app-user-agent-link
+                    [userAgent]="userAgent.userAgent"
+                  ></app-user-agent-link>
+                </td>
+                <td>{{ userAgent.count }}</td>
+                <td>{{ userAgent.totalHashRate | hashSuffix }}</td>
+                <td>{{ userAgent.bestDifficulty | numberSuffix }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+          <div class="text-right mt-2">
+            <i class="pi pi-star-fill"></i> = Open Source Software & Hardware
+          </div>
+        </ng-container>
+        <ng-template #loadingTable>
+          <p-table [value]="[{}, {}, {}]">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Device</th>
+                <th>Currently Working</th>
+                <th>Total Hash Rate</th>
+                <th>
+                  Best Difficulty
+                  <i
+                    class="pi pi-question-circle ml-2"
+                    pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."
+                  ></i>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr></tr>
+              <tr>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-template>
+      </div>
+    </div>
 
+    <div class="col-12" *ngIf="highScores$ | async as highScores">
+      <div class="card">
+        <h4 style="text-align: center">High Scores</h4>
+        <ng-container>
+          <p-table [value]="highScores">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Rank</th>
+                <th>Difficulty</th>
+                <th>Device</th>
+                <th>When</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-highScore let-i="rowIndex">
+              <tr></tr>
+              <tr>
+                <td>#{{ i + 1 }}</td>
+                <td>{{ highScore.bestDifficulty | numberSuffix }}</td>
+                <td>
+                  <app-user-agent-link
+                    [userAgent]="
+                      highScore.bestDifficultyUserAgent
+                        ? highScore.bestDifficultyUserAgent
+                        : 'unknown'
+                    "
+                  ></app-user-agent-link>
+                </td>
+                <td>{{ highScore.updatedAt | dateAgo }} ago</td>
+              </tr>
+            </ng-template>
+          </p-table>
+          <div class="text-right mt-2">
+            <i class="pi pi-star-fill"></i> = Open Source Software & Hardware
+          </div>
+        </ng-container>
+        <ng-template #loadingTable>
+          <p-table [value]="[{}, {}, {}]">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Device</th>
+                <th>Currently Working</th>
+                <th>Total Hash Rate</th>
+                <th>
+                  Best Difficulty
+                  <i
+                    class="pi pi-question-circle ml-2"
+                    pTooltip="If you find a solution with a difficulty higher than the network difficulty, you've found a block."
+                  ></i>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+              <tr></tr>
+              <tr>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+                <td><p-skeleton></p-skeleton></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-template>
+      </div>
+    </div>
 
+    <div class="col-12" *ngIf="blockData$ | async as blockData">
+      <div class="card">
+        <h4 style="text-align: center">Found Blocks</h4>
+        <p-table [value]="blockData">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Height</th>
+              <th>Address</th>
+              <th>Worker</th>
+              <th>Session</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-block>
+            <tr>
+              <td>{{ block.height }}</td>
+              <td>{{ block.minerAddress }}</td>
+              <td>{{ block.worker }}</td>
+              <td>{{ block.sessionId }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
 
-        <div class="col-12" *ngIf="blockData$ | async as blockData">
-            <div class="card">
-                <h4 style="text-align: center;"> Found Blocks</h4>
-                <p-table [value]="blockData">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th>Height</th>
-                            <th>Address</th>
-                            <th>Worker</th>
-                            <th>Session</th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-block>
-                        <tr>
-                            <td>{{ block.height }}</td>
-                            <td>{{ block.minerAddress }}</td>
-                            <td>{{ block.worker }}</td>
-                            <td>{{ block.sessionId }}</td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-
-            </div>
+    <div class="col-12">
+      <div class="card">
+        <h4>Login</h4>
+        <div class="field text-center">
+          <input
+            [formControl]="address"
+            placeholder="Address (bc1...)"
+            pInputText
+            id="address"
+            type="text"
+            class="p-inputtext p-component p-element"
+          />
+          <button
+            [disabled]="address.invalid"
+            class="ml-3 mt-3"
+            pButton
+            label="My Workers"
+            [routerLink]="['app', address.value]"
+          ></button>
         </div>
+      </div>
+    </div>
 
-        <div class="col-12">
+    <!-- <div class="col-12">
             <div class="card">
                 <div class="grid">
                     <div class="col-12 md:col-2">
@@ -234,6 +316,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> -->
+  </div>
 </div>
