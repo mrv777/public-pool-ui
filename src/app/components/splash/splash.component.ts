@@ -70,8 +70,20 @@ export class SplashComponent {
       ])),
       map(([chartData, networkInfo]) => {
         this.networkInfo = networkInfo;
-        return {
 
+        // Filter out extreme points based on comparison with the next point
+        const filteredChartData = chartData.filter((point: { data: number }, index: number, array: any[]) => {
+          if (index < array.length - 1) {
+            const nextPoint = array[index + 1].data;
+            const ratio = nextPoint / point.data;
+            return ratio >= 0.7 && ratio <= 1.5;
+          }
+          return true;
+        });
+
+        chartData = filteredChartData;
+
+        return {
           labels: chartData.map((d: any) => d.label),
           datasets: [
             {
@@ -90,7 +102,20 @@ export class SplashComponent {
       })
     );
 
-    this.hashrate$ = this.chartData$.pipe(map(chartData => chartData.datasets[0].data.slice(-1)[0])); 
+    // Calculate hashrate based on the last 5 points, removing outliers, and averaging the middle three
+    this.hashrate$ = this.chartData$.pipe(
+      map(chartData => {
+        const data = chartData.datasets[0].data;
+        if (data.length >= 5) {
+          const lastFivePoints = data.slice(-5);
+          const sortedPoints = [...lastFivePoints].sort((a, b) => a - b);
+          const middleThree = sortedPoints.slice(1, -1);
+          return middleThree.reduce((sum, value) => sum + value, 0) / 3;
+        } else {
+          return data.slice(-1)[0];
+        }
+      })
+    );
     this.address = new FormControl(null, bitcoinAddressValidator());
 
     const documentStyle = getComputedStyle(document.documentElement);
