@@ -46,8 +46,13 @@ export class SplashComponent {
       shareReplay({ refCount: true, bufferSize: 1 })
     );
 
-    this.info$ = refreshInterval$.pipe(
-      switchMap(() => this.appService.getInfo()),
+    // Combine all data fetching into a single observable
+    const combinedData$ = refreshInterval$.pipe(
+      switchMap(() => combineLatest([
+        this.appService.getInfo(),
+        this.appService.getInfoChart(),
+        this.appService.getNetworkInfo()
+      ])),
       shareReplay({ refCount: true, bufferSize: 1 })
     );
 
@@ -57,26 +62,27 @@ export class SplashComponent {
       this.stratumURL = window.location.hostname + ':3333';
     }
 
+    // Update existing observables
+    this.info$ = combinedData$.pipe(map(([info, _, __]) => info));
     this.blockData$ = this.info$.pipe(map(info => info.blockData));
     this.userAgents$ = this.info$.pipe(map(info => info.userAgents));
     this.highScores$ = this.info$.pipe(map(info => info.highScores));
     this.uptime$ = this.info$.pipe(map(info => info.uptime));
 
-    // Modify chartData$ to refresh both getInfoChart and getNetworkInfo
-    this.chartData$ = refreshInterval$.pipe(
-      switchMap(() => combineLatest([
-        this.appService.getInfoChart(),
-        this.appService.getNetworkInfo()
-      ])),
-      map(([chartData, networkInfo]) => {
+    // Update chartData$ to use the combined observable
+    this.chartData$ = combinedData$.pipe(
+      map(([_, chartData, networkInfo]) => {
         this.networkInfo = networkInfo;
-
         // Filter out extreme points based on comparison with the next point
         const filteredChartData = chartData.filter((point: { data: number }, index: number, array: any[]) => {
-          if (index < array.length - 1) {
+          if (index < array.length - 2) {
             const nextPoint = array[index + 1].data;
+            const nextNextPoint = array[index + 2].data;
             const ratio = nextPoint / point.data;
-            return ratio >= 0.7 && ratio <= 1.5;
+            const nextRatio = nextNextPoint / nextPoint;
+
+            // Exclude the current point if its ratio is abnormal and the next ratio is normal
+            return !((ratio < 0.7 || ratio > 1.5) && (nextRatio >= 0.7 && nextRatio <= 1.5));
           }
           return true;
         });

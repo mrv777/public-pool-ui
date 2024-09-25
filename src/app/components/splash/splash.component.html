@@ -211,7 +211,7 @@
                     "
                   ></app-user-agent-link>
                 </td>
-                <td>{{ highScore.updatedAt | dateAgo }} ago</td>
+                <td>{{ highScore.updatedAt + 'Z' | dateAgo }} ago</td>
               </tr>
             </ng-template>
           </p-table>
