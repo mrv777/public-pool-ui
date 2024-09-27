@@ -118,10 +118,11 @@
                 <div class="card mb-4" style="height: calc(100% - 1.5rem);">
                     <div class="flex justify-content-between mb-3">
                         <div>
-                            <span class="block text-500 font-medium mb-3">Block Height</span>
+                            <span class="block text-500 font-medium mb-3">Avg Time to Find a Block</span>
                             <div class="text-900 font-medium text-xl">
-                                <ng-container *ngIf="networkInfo$ | async as networkInfo; else loading">
-                                    {{networkInfo.blocks}}</ng-container>
+                                <ng-container *ngIf="clientInfo$ | async as clientInfo; else loading">{{getGlobalTotalHashRate(clientInfo.workers) |
+                                    averageTimeToBlock : networkInfo.difficulty }}
+                                    </ng-container>
                                 <ng-template #loading><p-skeleton></p-skeleton></ng-template>
                             </div>
                         </div>

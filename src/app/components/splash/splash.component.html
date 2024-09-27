@@ -51,7 +51,7 @@
       <div class="card relative">
         <h4 class="text-center">OMB Pool Stats</h4>
         <p class="text-center text-sm absolute" style="top: 0.5rem; right: 1rem;">Last update: {{ lastUpdate$ | async | date:'MMM d, y, h:mm a' }}</p>
-        <div *ngIf="networkInfo" class="network-info-container mt-4">
+        <div *ngIf="networkInfo" class="network-info-container mt-4 flex flex-column sm:flex-row">
           <div class="network-info-item">
             <div class="info-label">Uptime</div>
             <div class="info-value">{{ uptime$ | async | dateAgo }}</div>
@@ -61,6 +61,7 @@
             <div class="info-value">
               {{ (hashrate$ | async) ?? 0 | hashSuffix }}
             </div>
+            <div class="info-label">Network: {{ networkInfo.networkhashps | hashSuffix }}</div>
           </div>
           <div class="network-info-item">
             <div class="info-label">Avg Time to Find a Block</div>
@@ -75,28 +76,10 @@
       </div>
     </div>
 
-    <div class="col-12">
-      <div class="card chart">
-        <ng-container
-          *ngIf="chartData$ | async as chartData; else loadingChart"
-        >
-          <p-chart
-            [responsive]="true"
-            type="line"
-            [data]="chartData"
-            [options]="chartOptions"
-          ></p-chart>
-        </ng-container>
-        <ng-template #loadingChart>
-          <p-skeleton width="100%" height="40vh"></p-skeleton>
-        </ng-template>
-      </div>
-    </div>
-
-    <div class="col-12">
+    <!-- <div class="col-12">
       <div class="card">
         <h4 class="text-center">Network Info</h4>
-        <div *ngIf="networkInfo" class="network-info-container mt-4">
+        <div *ngIf="networkInfo" class="network-info-container mt-4 flex flex-column sm:flex-row">
           <div class="network-info-item">
             <div class="info-label">Block</div>
             <div class="info-value">{{ networkInfo.blocks }}</div>
@@ -114,6 +97,24 @@
             </div>
           </div>
         </div>
+      </div>
+    </div> -->
+
+    <div class="col-12">
+      <div class="card chart">
+        <ng-container
+          *ngIf="chartData$ | async as chartData; else loadingChart"
+        >
+          <p-chart
+            [responsive]="true"
+            type="line"
+            [data]="chartData"
+            [options]="chartOptions"
+          ></p-chart>
+        </ng-container>
+        <ng-template #loadingChart>
+          <p-skeleton width="100%" height="40vh"></p-skeleton>
+        </ng-template>
       </div>
     </div>
 
@@ -187,21 +188,23 @@
     <div class="col-12" *ngIf="highScores$ | async as highScores">
       <div class="card">
         <h4 style="text-align: center">High Scores</h4>
+        <div class="text-center info-label">Network Difficulty: {{ networkInfo.difficulty | numberSuffix }}</div>
         <ng-container>
           <p-table [value]="highScores">
             <ng-template pTemplate="header">
               <tr>
                 <th>Rank</th>
-                <th>Difficulty</th>
+                <th>Address</th>
                 <th>Device</th>
-                <th>When</th>
+                <th>Difficulty</th>
+                <th class="hidden sm:block">When</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-highScore let-i="rowIndex">
               <tr></tr>
               <tr>
                 <td>#{{ i + 1 }}</td>
-                <td>{{ highScore.bestDifficulty | numberSuffix }}</td>
+                <td>{{ highScore.truncatedAddress }}</td>
                 <td>
                   <app-user-agent-link
                     [userAgent]="
@@ -211,7 +214,8 @@
                     "
                   ></app-user-agent-link>
                 </td>
-                <td>{{ highScore.updatedAt + 'Z' | dateAgo }} ago</td>
+                <td>{{ highScore.bestDifficulty | numberSuffix }}</td>
+                <td class="hidden sm:block">{{ highScore.updatedAt + 'Z' | dateAgo }} ago</td>
               </tr>
             </ng-template>
           </p-table>
@@ -277,7 +281,7 @@
       <div class="card">
         <h4 class="text-center">Connection Info</h4>
         <div class="info mb-2 p-4 border-dashed border-1 border-round text-center">
-            <code>stratum+tcp://{{ stratumURL }}</code>
+            <code style="line-break: anywhere;">stratum+tcp://{{ stratumURL }}</code>
             <br />
             <code
               >username: &lt;your BTC address&gt;.&lt;worker name&gt;, password:

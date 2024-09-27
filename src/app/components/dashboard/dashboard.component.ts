@@ -25,7 +25,7 @@ export class DashboardComponent implements AfterViewInit {
   public chartOptions: any;
 
   public networkInfo$: Observable<any>;
-  private networkInfo:any;
+  public networkInfo:any;
 
   @ViewChild('dataTable') dataTable!: Table;
 
@@ -144,7 +144,7 @@ export class DashboardComponent implements AfterViewInit {
           ticks: {
             color: textColorSecondary,
             callback: (value: number) => {
-              return HashSuffixPipe.transform(value) + " - " + AverageTimeToBlockPipe.transform(value, this.networkInfo.difficulty);
+              return HashSuffixPipe.transform(value);
             }
           },
           grid: {
